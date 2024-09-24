@@ -75,6 +75,11 @@ var_check$Variance[2]/var_check$Variance[1]
 
 #Conclusion: the data does not have a normal distribution of its numerical variable duration of visit. 
 
+#Fixing normality with log transformation
+normalized_post_data<-log(post_data$Duration_of_visit)
+qqnorm(normalized_post_data)
+qqline(normalized_post_data,col = "red")
+shapiro.test(normalized_post_data)
 
-
+#Conclusion: Data closer to normal, however, still not fully.
 
