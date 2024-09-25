@@ -1,0 +1,122 @@
+---
+title: "Preliminary Data Submission"
+author: "Breh, Danna, Dahee, Jessi"
+date: "2024-09-25"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(readr)
+```
+
+## Preliminary Data Analysis Submission
+
+# Load in Data
+```{r}
+pollinators <- read_csv("/Users/Breh/Desktop/ENT6702_Group_Project/Original_file_Breh/Pollinator_Obs_Data_24_ENT_6702.csv")
+```
+The data used is from Breh's thesis research. It is pollinator observation data collected from Summer 2024.
+
+# Inspect the first few rows of the data
+```{r}
+head(pollinators)
+```
+
+# Ensure variables are assigned their correct data types
+```{r}
+pollinators <- pollinators %>%
+  mutate(
+    Location = as.factor(Location),              
+    Application = as.factor(Application),        
+    Date = as.Date(Date, format = "%Y-%m-%d"),   
+    Treatment = as.factor(Treatment),            
+    Zone = as.factor(Zone),                      
+    Sample = as.factor(Sample),                
+    Pollinator_category = as.factor(Pollinator_category),  
+    Duration_of_visit = as.numeric(Duration_of_visit),
+    Pollination_event = as.factor(Pollination_event)   
+  )
+```
+
+# Subset the data to only include POST treatment data
+```{r}
+post_data <- pollinators %>%
+  filter(Application == "Post") %>% 
+  droplevels() 
+```
+
+# Inspect the first few rows of the subset data
+```{r}
+str(post_data)
+summary(post_data)
+head(post_data)
+tail(post_data)
+view(post_data)
+```
+
+# Viewing data and dealing with NA values 
+```{r}
+post_data %>% group_by(Pollinator_category) %>% summarise (Means= mean(Duration_of_visit), SD = sd(Duration_of_visit), max_sep = max(Duration_of_visit)) %>% arrange(Means)
+mean(post_data$"Duration_of_visit")
+```
+
+# Boxplot of a specific variable
+```{r}
+ggplot(post_data, aes(x = Pollinator_category, y = Duration_of_visit)) + 
+  geom_boxplot() + theme_minimal()
+
+ggplot(post_data, aes(x = Treatment, y = Duration_of_visit)) + 
+  geom_boxplot() +
+  theme_minimal()
+```
+
+# Boxplot with points 
+```{r}
+ggplot(post_data, aes(x = Pollinator_category, y = Duration_of_visit)) + 
+    geom_boxplot() +  geom_jitter(width = 0.2, size = 2, color = "blue") +
+    theme_minimal()
+
+ggplot(post_data, aes(x = Treatment, y = Duration_of_visit)) + 
+  geom_boxplot() + geom_jitter(width = 0.2, size = 2, color = "blue") +
+  theme_minimal()
+```
+
+# Q-Q to see normality 
+```{r}
+qqnorm(post_data$Duration_of_visit)
+qqline(post_data$Duration_of_visit, col = "red")
+```
+
+# Checking normality with histogram
+```{r}
+hist(post_data$Duration_of_visit)
+```
+
+# Checking normality with shapiro test
+```{r}
+shapiro.test(post_data$Duration_of_visit)
+```
+
+# Checking homogeneity of variance
+```{r}
+var_check <- post_data %>% group_by(Pollinator_category) %>% summarise(Variance = var(Duration_of_visit))
+var_check$Variance[2]/var_check$Variance[1]
+```
+
+# Conclusion: 
+The data does not have a normal distribution of its numerical variable duration of visit. 
+
+# Transforming data with log transformation to see impact on normality
+```{r}
+normalized_post_data<-log(post_data$Duration_of_visit)
+qqnorm(normalized_post_data)
+qqline(normalized_post_data,col = "red")
+shapiro.test(normalized_post_data)
+```
+
+# Final conclusion: 
+Data closer to normal, however, still not fully.
