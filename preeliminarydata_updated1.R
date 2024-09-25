@@ -6,7 +6,8 @@ library(tidyverse)
 library(dplyr)
 
 # Load the dataset
-pollinators <- read_csv("C:/Users/chemk/OneDrive/Desktop/Classes/ENT6707_DataAnalysis/group_project/6707-Group-Project/Original_file_Breh/Pollinator.csv")
+pollinators <- read_csv("/Users/Breh/Desktop/ENT6702_Group_Project/Original_file_Breh/Pollinator_Obs_Data_24_ENT_6702.csv")
+#The data used is from Breh's thesis research. It is pollinator observation data collected from Summer 2024. 
 
 # Inspect the first few rows of the data
 head(pollinators)
@@ -19,8 +20,10 @@ pollinators <- pollinators %>%
     Date = as.Date(Date, format = "%Y-%m-%d"),   # Convert date to Date (adjust format if necessary)
     Treatment = as.factor(Treatment),            # Convert treatment to factor
     Zone = as.factor(Zone),                      # Convert zone to factor
+    Sample = as.factor(Sample),                  # Convert sample to factor
     Pollinator_category = as.factor(Pollinator_category),  # Convert pollinator_category to factor
-    Duration_of_visit = as.numeric(Duration_of_visit)  # Convert duration_of_visit to numeric
+    Duration_of_visit = as.numeric(Duration_of_visit), # Convert duration_of_visit to numeric
+    Pollination_event = as.factor(Pollination_event)   #Convert pollination_event to factor
   )
 
 
@@ -52,7 +55,7 @@ ggplot(post_data, aes(x = Treatment, y = Duration_of_visit)) +
   
 #Boxplot with points 
   ggplot(post_data, aes(x = Pollinator_category, y = Duration_of_visit)) + 
-    geom_boxplot() +  geom_jitter(width = 0.2, size = 2, color = "blue")
+    geom_boxplot() +  geom_jitter(width = 0.2, size = 2, color = "blue") +
   theme_minimal()
 
 ggplot(post_data, aes(x = Treatment, y = Duration_of_visit)) + 
