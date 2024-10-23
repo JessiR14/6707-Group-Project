@@ -1,4 +1,5 @@
 # Load necessary packages
+rm(list=ls())
 library(readr)  # for reading CSV files
 library(dplyr)  # for data manipulation
 library(ggplot2) # for plotting
@@ -6,7 +7,7 @@ library(tidyverse)
 library(dplyr)
 
 # Load the dataset
-pollinators <- read_csv("C:/Desktop/Classes/ENT6707_DataAnalysis/group_project/6707-Group-Project/Original_file_Breh/Pollinator_Obs_Data_24_ENT_6702.csv")
+pollinators <- read_csv("C:/Users/chemk/Desktop/Classes/ENT6707_DataAnalysis/group_project/6707-Group-Project/Original_file_Breh/Pollinator_Obs_Data_24_ENT_6702.csv")
 
 # Inspect the first few rows of the data
 head(pollinators)
@@ -65,7 +66,9 @@ shapiro.test(post_data$Duration_of_visit)
 #Conclusion: the data does not have a normal distribution of its numerical variable duration of visit. 
 
 
-#log Q-Q to see normality _ DaheeUpdated
+
+######################## DaheeUpdated start ##########################
+#log Q-Q to see normality
 library(dplyr)
 
 #log - qqnorm looks good, but I tried to do histogram which didn't look good.
@@ -80,25 +83,71 @@ library(lmerTest)
 
 # 1
 post_data <- post_data %>% mutate(Duration_of_visit_sqrt = sqrt(Duration_of_visit))
-mixed_model_sqrt <- lmer(Duration_of_visit_sqrt ~ Pollinator_category + Treatment + (1 | Location) + (1 | Zone), data = post_data) # This doesn't work. Errors keep occuring. 
+mixed_model_sqrt_1 <- lmer(Duration_of_visit_sqrt ~ Pollinator_category + Treatment + (1 | Location) + (1 | Zone), data = post_data) # This doesn't work. Errors keep occuring. 
 
 # 2
 post_data <- post_data %>% mutate(Duration_of_visit_sqrt = sqrt(Duration_of_visit))
-mixed_model_sqrt <- lmer(Duration_of_visit_sqrt ~ Pollinator_category + Treatment + (Pollinator_category | Location) + (Pollinator_category | Zone), data = post_data)
-summary(mixed_model_sqrt)
+mixed_model_sqrt_2 <- lmer(Duration_of_visit_sqrt ~ Pollinator_category + Treatment + (Pollinator_category | Location) + (Pollinator_category | Zone), data = post_data)
+summary(mixed_model_sqrt_2)
 ## This works. If we assume that the effect of Pollinator_category may vary depending on Location/Zone, it can be used. However, p-value doesn't seem to be significant.
 
 # 3
 post_data <- post_data %>% mutate(Duration_of_visit_sqrt = sqrt(Duration_of_visit))
-mixed_model_sqrt <- lmer(Duration_of_visit_sqrt ~ Pollinator_category + Treatment + (1 | Location), data = post_data)
-summary(mixed_model_sqrt) ## This works. I guess we have too many random effect, so if we can delete one random effect, this may work. In summary, the p-value of intercept is only significant.
+mixed_model_sqrt_3 <- lmer(Duration_of_visit_sqrt ~ Pollinator_category + Treatment + (1 | Location), data = post_data)
+summary(mixed_model_sqrt_3) ## This works. I guess we have too many random effect, so if we can delete one random effect, this may work. In summary, the p-value of intercept is only significant.
 
 # 4
 post_data <- post_data %>% mutate(Duration_of_visit_sqrt = sqrt(Duration_of_visit))
-mixed_model_sqrt <- lmer(Duration_of_visit_sqrt ~ Pollinator_category + Treatment + (1 | Zone), data = post_data)
-summary(mixed_model_sqrt) ## This doesn't work, assuming that there might be some problems with variables of "Zone".
+mixed_model_sqrt_4 <- lmer(Duration_of_visit_sqrt ~ Pollinator_category + Treatment + (1 | Zone), data = post_data)
+summary(mixed_model_sqrt_4) ## This doesn't work, assuming that there might be some problems with variables of "Zone".
 
 plot(mixed_model_sqrt)
+
+
+library(lmerTest)
+
+# 2
+# Fit the mixed model with lmerTest for p-values
+qqnorm(resid(mixed_model_sqrt_2))
+qqline(resid(mixed_model_sqrt_2), col = "red")
+# Extract fitted values and residuals
+fitted_values_2 <- fitted(mixed_model_sqrt_2)
+residuals_2 <- resid(mixed_model_sqrt_2)
+# Create Residuals vs Fitted plot
+ggplot(data.frame(fitted_values_2, residuals_2), aes(x = fitted_values_2, y = residuals_2)) +
+  geom_point() +
+  geom_hline(yintercept = 0, color = "red") +
+  labs(x = "Fitted Values", y = "Residuals", title = "Residuals vs Fitted") +
+  theme_minimal()
+# Visualize random effects
+install.packages("sjPlot")
+library(sjPlot)
+plot_model(mixed_model_sqrt_2, type = "re")
+
+
+# 3
+# Fit the mixed model with lmerTest for p-values
+qqnorm(resid(mixed_model_sqrt_3))
+qqline(resid(mixed_model_sqrt_3), col = "red")
+# Extract fitted values and residuals
+fitted_values_3 <- fitted(mixed_model_sqrt_3)
+residuals_3 <- resid(mixed_model_sqrt_3)
+# Create Residuals vs Fitted plot
+ggplot(data.frame(fitted_values_3, residuals_3), aes(x = fitted_values_3, y = residuals_3)) +
+  geom_point() +
+  geom_hline(yintercept = 0, color = "red") +
+  labs(x = "Fitted Values", y = "Residuals", title = "Residuals vs Fitted") +
+  theme_minimal()
+# Visualize random effects
+library(ggplot2)
+install.packages("sjPlot")
+library(sjPlot)
+plot_model(mixed_model_sqrt_3, type = "re")
+
+
+##################### Daheeupdated end #######################
+
+
 
 
 
